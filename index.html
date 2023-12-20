@@ -1,126 +1,35 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Text to Speech</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      text-align: center;
-      margin-top: 50px;
-    }
-    .text-container {
-      margin-bottom: 20px;
-      font-size: 20px;
-    }
-    .switch {
-      position: relative;
-      display: inline-block;
-      width: 60px;
-      height: 34px;
-    }
-    .switch input { 
-      opacity: 0;
-      width: 0;
-      height: 0;
-    }
-    .slider {
-      position: absolute;
-      cursor: pointer;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background-color: #ccc;
-      -webkit-transition: .4s;
-      transition: .4s;
-    }
-    .slider:before {
-      position: absolute;
-      content: "";
-      height: 26px;
-      width: 26px;
-      left: 4px;
-      bottom: 4px;
-      background-color: white;
-      -webkit-transition: .4s;
-      transition: .4s;
-    }
-    input:checked + .slider {
-      background-color: #2196F3;
-    }
-    input:focus + .slider {
-      box-shadow: 0 0 1px #2196F3;
-    }
-    input:checked + .slider:before {
-      -webkit-transform: translateX(26px);
-      -ms-transform: translateX(26px);
-      transform: translateX(26px);
-    }
-    .slider.round {
-      border-radius: 34px;
-    }
-    .slider.round:before {
-      border-radius: 50%;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Azure Speech SDK Test</title>
 </head>
 <body>
-  <div class="text-container">שלום, זה טקסט לדוגמא בעברית</div>
-  <button id="speakButton">Speak</button> 
+    <button id="speakButton">Speak</button>
 
-  <script src="https://aka.ms/csspeech/jsbrowserpackageraw"></script>
-  <script>
-let player = null;
-let synthesizer = null;
-let isSpeaking = false;
+    <script src="https://aka.ms/csspeech/jsbrowserpackageraw"></script>
+    <script>
+        document.getElementById('speakButton').addEventListener('click', function() {
+            const speechConfig = SpeechSDK.SpeechConfig.fromSubscription("72652521bc954d34a63111de0781f586", "germanywestcentral");
+            speechConfig.speechSynthesisLanguage = "en-US"; // Set to your preferred language
+            speechConfig.speechSynthesisVoiceName = "en-US-AriaNeural"; // Set to your preferred voice
 
-document.addEventListener('DOMContentLoaded', function () {
-    const speakButton = document.getElementById('speakButton');
+            const audioConfig = SpeechSDK.AudioConfig.fromDefaultSpeakerOutput();
+            const synthesizer = new SpeechSDK.SpeechSynthesizer(speechConfig, audioConfig);
 
-    if (speakButton) {
-        speakButton.addEventListener('click', function () {
-            if (!isSpeaking) {
-                startSpeechSynthesis();
-            } else {
-                muteAudio();
-            }
+            synthesizer.speakTextAsync("Hello, this is a test of Azure Speech SDK on iOS.",
+                result => {
+                    if (result) {
+                        console.log("Speech synthesized to speaker for text 'Hello, this is a test of Azure Speech SDK on iOS.'");
+                    }
+                    synthesizer.close();
+                },
+                error => {
+                    console.error(error);
+                    synthesizer.close();
+                });
         });
-    } else {
-        console.error('Speak button not found');
-    }
-});
-function startSpeechSynthesis() {
-    if (!isSpeaking) {
-        const sdk = SpeechSDK;
-        const speechConfig = sdk.SpeechConfig.fromSubscription("72652521bc954d34a63111de0781f586", "germanywestcentral");
-        player = new sdk.SpeakerAudioDestination();
-        const audioConfig = sdk.AudioConfig.fromSpeakerOutput(player);
-        speechConfig.speechSynthesisLanguage = "he-IL"; 
-        speechConfig.speechSynthesisVoiceName = "he-IL-HilaNeural";
-
-        synthesizer = new sdk.SpeechSynthesizer(speechConfig, audioConfig);
-        const text = "שלום, זה טקסט לדוגמא בעברית";
-        synthesizer.speakTextAsync(text);
-        isSpeaking = true;
-    }
-}
-
-function muteAudio() {
-    if (player) {
-        player.mute();
-        isSpeaking = false;
-    }
-}
-
-function unmuteAudio() {
-    if (player) {
-        player.unmute();
-    }
-}
-
-
-</script>
+    </script>
 </body>
 </html>
