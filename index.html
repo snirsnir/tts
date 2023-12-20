@@ -68,33 +68,29 @@
 </head>
 <body>
   <div class="text-container">שלום, זה טקסט לדוגמא בעברית</div>
-  <label class="switch">
-    <input type="checkbox" id="speakToggle">
-    <span class="slider round"></span>
-  </label>
+  <button id="speakButton">Speak</button> 
 
   <script src="https://aka.ms/csspeech/jsbrowserpackageraw"></script>
   <script>
-    let player = null;
+let player = null;
 let synthesizer = null;
 let isSpeaking = false;
 
 document.addEventListener('DOMContentLoaded', function () {
-    const speakToggle = document.getElementById('speakToggle');
+    const speakButton = document.getElementById('speakButton');
 
-    if (speakToggle) {
-        speakToggle.addEventListener('change', function () {
-            if (this.checked) {
+    if (speakButton) {
+        speakButton.addEventListener('click', function () {
+            if (!isSpeaking) {
                 startSpeechSynthesis();
             } else {
                 muteAudio();
             }
         });
     } else {
-        console.error('Speak toggle button not found');
+        console.error('Speak button not found');
     }
 });
-
 function startSpeechSynthesis() {
     if (!isSpeaking) {
         const sdk = SpeechSDK;
